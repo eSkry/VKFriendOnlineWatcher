@@ -1,2 +1,4 @@
 .vscode
-
+config/config.conf
+.idea
+vk_config.v2.json
