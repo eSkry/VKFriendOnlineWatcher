@@ -39,3 +39,8 @@ def insertMetrics(conn: sqlite3.Connection, metrics):
                     .format( metrics[key]['id'], metrics[key]['online'], metrics[key]['timestamp'] ))
         
     conn.commit()
+
+
+def getAllData(conn: sqlite3.Connection):
+    return conn.execute('SELECT * FROM statistics;')
+    
