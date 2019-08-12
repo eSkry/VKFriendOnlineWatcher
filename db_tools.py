@@ -32,8 +32,11 @@ def CreateDB(sql_file: str):
     return conn
 
 
+def GetLastState(conn: sqlite3.Connection, user_id):
+    return conn.execute('SELECT *, max(timestamp) FROM statistics WHERE user_id = {}'.format(user_id))
 
-def insertMetrics(conn: sqlite3.Connection, metrics):
+
+def InsertMetrics(conn: sqlite3.Connection, metrics):
     for key in metrics.keys():
         conn.execute('INSERT INTO statistics (user_id, online, timestamp) VALUES ({}, {}, {});'
                     .format( metrics[key]['id'], metrics[key]['online'], metrics[key]['timestamp'] ))

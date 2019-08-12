@@ -7,7 +7,7 @@ import os
 
 import db_tools as db
 
-UPDATE_TIME = 40 # In seconds
+UPDATE_TIME = 60 # In seconds
 
 config = configparser.ConfigParser()
 config.read("./config/config.conf")
@@ -26,9 +26,18 @@ def GetUnixTimestamp():
 def get_friends():
     result = {}    
     friends = vk.friends.get(fields=['sex, nickname'])['items']
+    timestamp = GetUnixTimestamp()
 
     for user in friends:
-        result[ user['id'] ] = { 'id': user['id'], 'online': user['online'], 'timestamp': GetUnixTimestamp() };
+        cur = db.GetLastState(conn, int(user['id']))
+        data = cur.fetchone()
+
+        if data != None and data[2] != None:
+            if int(data[2]) == int(user['online']):
+                continue
+            
+        result[ user['id'] ] = { 'id': user['id'], 'online': user['online'], 'timestamp': timestamp };
+
 
     return result
 
@@ -36,6 +45,6 @@ i = 0
 while (True):
     i = i + 1
     print( 'Check' + str( i ) )
-    db.insertMetrics(conn, get_friends())
+    db.InsertMetrics(conn, get_friends())
     time.sleep( UPDATE_TIME )
             
