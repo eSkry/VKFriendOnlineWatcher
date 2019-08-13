@@ -6,6 +6,7 @@ import time
 import os
 
 import db_tools as db
+import pushgateway_tools as pgt
 
 UPDATE_TIME = 60 # In seconds
 
@@ -28,6 +29,8 @@ def get_friends():
     friends = vk.friends.get(fields=['sex, nickname'])['items']
     timestamp = GetUnixTimestamp()
 
+    pushgateway_str = ""
+
     for user in friends:
         cur = db.GetLastState(conn, int(user['id']))
         data = cur.fetchone()
@@ -35,10 +38,12 @@ def get_friends():
         if data != None and data[2] != None:
             if int(data[2]) == int(user['online']):
                 continue
-            
+        
         result[ user['id'] ] = { 'id': user['id'], 'online': user['online'], 'timestamp': timestamp };
-
-
+        pushgateway_str += 'friends_online_stats{user=\'' +  str(user['id']) + '\'} ' + str(user['online']) + ' ' + str(timestamp) + '\n'
+        print('asa')
+    
+    pgt.SendMetrics(pushgateway_str)
     return result
 
 i = 0
