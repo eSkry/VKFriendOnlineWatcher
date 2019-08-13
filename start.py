@@ -41,7 +41,6 @@ def get_friends():
         
         result[ user['id'] ] = { 'id': user['id'], 'online': user['online'], 'timestamp': timestamp };
         pushgateway_str += 'friends_online_stats{user=\'' +  str(user['id']) + '\'} ' + str(user['online']) + ' ' + str(timestamp) + '\n'
-        print('asa')
     
     pgt.SendMetrics(pushgateway_str)
     return result
