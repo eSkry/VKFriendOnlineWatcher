@@ -29,7 +29,7 @@ def get_friends():
     friends = vk.friends.get(fields=['sex, nickname'])['items']
     timestamp = GetUnixTimestamp()
 
-    pushgateway_str = "# TYPE friends_online_stats numeric\n"
+    pushgateway_str = ""
 
     for user in friends:
         cur = db.GetLastState(conn, int(user['id']))
@@ -43,8 +43,7 @@ def get_friends():
         
         result[ user['id'] ] = { 'id': user['id'], 'online': user['online'], 'timestamp': timestamp };
     
-    if len(pushgateway_str) != 0: 
-        pgt.SendMetrics(pushgateway_str)
+    pgt.SendMetrics(pushgateway_str)
 
     return result
 
