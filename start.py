@@ -40,9 +40,13 @@ def get_friends():
                 continue
         
         result[ user['id'] ] = { 'id': user['id'], 'online': user['online'], 'timestamp': timestamp };
-        pushgateway_str += 'friends_online_stats{user=\'' +  str(user['id']) + '\'} ' + str(user['online']) + ' ' + str(timestamp) + '\n'
+        full_name = str(user['first_name']) + ' ' + str(user['last_name'])
+        pushgateway_str += 'friends_online_stats{user="' +  str(user['id']) + '", full_name="' + full_name + '"} ' + str(user['online']) + '\n'
     
-    pgt.SendMetrics(pushgateway_str)
+    if len(pushgateway_str) != 0: 
+        print(pushgateway_str)
+        pgt.SendMetrics(pushgateway_str)
+
     return result
 
 i = 0
