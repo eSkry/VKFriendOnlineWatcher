@@ -29,7 +29,7 @@ def get_friends():
     friends = vk.friends.get(fields=['sex, nickname'])['items']
     timestamp = GetUnixTimestamp()
 
-    pushgateway_str = ""
+    pushgateway_str = "# TYPE friends_online_stats numeric\n"
 
     for user in friends:
         cur = db.GetLastState(conn, int(user['id']))
