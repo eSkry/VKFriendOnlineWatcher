@@ -36,15 +36,14 @@ def get_friends():
         data = cur.fetchone()
 
         if data != None and data[2] != None:
+            full_name = str(user['first_name']) + ' ' + str(user['last_name'])
+            pushgateway_str += 'friends_online_stats{user="' +  str(user['id']) + '", full_name="' + full_name + '"} ' + str(user['online']) + '\n'
             if int(data[2]) == int(user['online']):
                 continue
         
         result[ user['id'] ] = { 'id': user['id'], 'online': user['online'], 'timestamp': timestamp };
-        full_name = str(user['first_name']) + ' ' + str(user['last_name'])
-        pushgateway_str += 'friends_online_stats{user="' +  str(user['id']) + '", full_name="' + full_name + '"} ' + str(user['online']) + '\n'
     
     if len(pushgateway_str) != 0: 
-        print(pushgateway_str)
         pgt.SendMetrics(pushgateway_str)
 
     return result
