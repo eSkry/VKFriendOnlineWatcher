@@ -23,7 +23,10 @@ def CreateDB(sql_file: str):
     if (IsFileExists(DB_NAME)):
         return sqlite3.connect(DB_NAME, isolation_level=None)
 
-    conn = sqlite3.connect(DB_NAME)
+    try:
+        conn = sqlite3.connect(DB_NAME)
+    except:
+        print('Db create error')
 
     if IsFileExists(sql_file):
         sql = ReadAllFile(sql_file)

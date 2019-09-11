@@ -13,13 +13,11 @@ UPDATE_TIME = 60 # In seconds
 config = configparser.ConfigParser()
 config.read("./config/config.conf")
 
-conn = db.CreateDB('init.sql')
-
 def GetUnixTimestamp():
     return datetime.now().timestamp()
 
 
-def get_friends(vk):
+def get_friends(vk, conn):
     result = {}    
     friends = vk.friends.get(fields=['sex, nickname'])['items']
     timestamp = GetUnixTimestamp()
@@ -49,13 +47,18 @@ while (True):
         vk_session = vk_api.VkApi(config['Auth']['vk_login'], config['Auth']['vk_password'])
         vk_session.auth()
         vk = vk_session.get_api()
+        conn = db.CreateDB('init.sql')
+
         while (True):
-            db.InsertMetrics(conn, get_friends(vk))
+            db.InsertMetrics(conn, get_friends(vk, conn))
             time.sleep( UPDATE_TIME )
-    except ConnectionError:
-        print('Connection to VK error')
+
+    except vk_api.AuthError:
+        print('VK Auth error')
+    except vk_api.VkApiError:
+        print('VK API error')
     except:
-        print('Stop working')
         print('Error in main stream, continue work....')
+        print('Stop working')
     finally:
         time.sleep( 1 )
