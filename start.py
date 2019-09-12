@@ -57,8 +57,9 @@ while (True):
         print('VK Auth error')
     except vk_api.VkApiError:
         print('VK API error')
-    except:
+    except Exception as e:
         print('Error in main stream, continue work....')
+        print(e)
         print('Stop working')
     finally:
         time.sleep( 1 )
