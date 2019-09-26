@@ -2,7 +2,7 @@ BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS `statistics` (
 	`id`	INTEGER PRIMARY KEY AUTOINCREMENT,
 	`user_id` INTEGER,
-	`online`	INTEGER,
-	`timestamp`	REAL
+	`begin_online`	REAL,
+	`end_online` REAL
 );
 COMMIT;

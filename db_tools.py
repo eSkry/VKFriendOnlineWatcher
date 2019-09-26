@@ -19,12 +19,12 @@ def IsFileExists(file):
     return os.path.exists(file) and os.path.isfile(file)
 
 
-def CreateDB(sql_file: str):
-    if (IsFileExists(DB_NAME)):
-        return sqlite3.connect(DB_NAME, isolation_level=None)
+def CreateDB(sql_file: str, db_name = DB_NAME):
+    if (IsFileExists(db_name)):
+        return sqlite3.connect(db_name, isolation_level=None)
 
     try:
-        conn = sqlite3.connect(DB_NAME)
+        conn = sqlite3.connect(db_name)
     except:
         print('Db create error')
 
@@ -46,7 +46,21 @@ def InsertMetrics(conn: sqlite3.Connection, metrics):
         
     conn.commit()
 
+def InserMetrics2(conn: sqlite3.Connection, metrics):
+    pass
+
+def GetLastState2(conn: sqlite3.Connection, user_id):
+    cur = conn.execute('SELECT max(id) as id, begin_online, end_online FROM statistics WHERE user_id = {}'.format(user_id))
+    data cur.fetchone()
+
+    if data == None:
+        return 0
+
+    if data[1] != None and data[2] != None:
+        return 0 
+    else if data[1] != None:
+        return 1
+
 
 def getAllData(conn: sqlite3.Connection):
     return conn.execute('SELECT * FROM statistics;')
-    
