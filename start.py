@@ -18,27 +18,27 @@ def GetUnixTimestamp():
 
 
 def get_friends(vk, conn):
-    result = {}    
     friends = vk.friends.get(fields=['sex, nickname'])['items']
     timestamp = GetUnixTimestamp()
 
     pushgateway_str = ""
 
     for user in friends:
-        cur = db.GetLastState(conn, int(user['id']))
-        data = cur.fetchone()
+        cur = db.GetLastState2(conn, int(user['id']))
+        state = cur.fetchone()
 
-        if data != None and data[2] != None:
+        if state != None:
             full_name = str(user['first_name']) + ' ' + str(user['last_name'])
             pushgateway_str += 'friends_online_stats{user="' +  str(user['id']) + '", full_name="' + full_name + '"} ' + str(user['online']) + '\n'
-            if int(data[2]) == int(user['online']):
+            if int(state) == int(user['online']):
                 continue
         
-        result[ user['id'] ] = { 'id': user['id'], 'online': user['online'], 'timestamp': timestamp };
+        if int(user['online']) == 0:
+            db.InsertOffline2(conn, user['id'], timestamp)
+        else if int(user['online'] == 1):
+            db.InsertOnline2(conn, user['id'], timestamp)
     
     pgt.SendMetrics(pushgateway_str)
-
-    return result
 
 
 while (True):
@@ -50,7 +50,7 @@ while (True):
         conn = db.CreateDB('init.sql')
 
         while (True):
-            db.InsertMetrics(conn, get_friends(vk, conn))
+            get_friends(vk, conn)
             time.sleep( UPDATE_TIME )
 
     except vk_api.AuthError:
