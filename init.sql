@@ -1,8 +1,8 @@
 BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS `statistics` (
-	`id`	INTEGER PRIMARY KEY AUTOINCREMENT,
-	`user_id` INTEGER,
-	`begin_online`	REAL,
-	`end_online` REAL
+	"id"	INTEGER PRIMARY KEY AUTOINCREMENT,
+	"user_id"	INTEGER NOT NULL,
+	"begin_online"	REAL DEFAULT NULL,
+	"end_online"	REAL DEFAULT NULL
 );
 COMMIT;
