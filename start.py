@@ -24,22 +24,20 @@ def get_friends(vk, conn):
     pushgateway_str = ""
 
     for user in friends:
-        cur = db.GetLastState2(conn, int(user['id']))
-        state = cur.fetchone()
+        state = db.GetLastState2(conn, int(user['id']))
 
         if state != None:
             full_name = str(user['first_name']) + ' ' + str(user['last_name'])
             pushgateway_str += 'friends_online_stats{user="' +  str(user['id']) + '", full_name="' + full_name + '"} ' + str(user['online']) + '\n'
             if int(state) == int(user['online']):
                 continue
-        
+
         if int(user['online']) == 0:
             db.InsertOffline2(conn, user['id'], timestamp)
-        else if int(user['online'] == 1):
+        elif int(user['online'] == 1):
             db.InsertOnline2(conn, user['id'], timestamp)
-    
-    pgt.SendMetrics(pushgateway_str)
 
+    pgt.SendMetrics(pushgateway_str)
 
 while (True):
     try:

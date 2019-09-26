@@ -56,14 +56,14 @@ def InsertOffline2(conn: sqlite3.Connection, user_id, timestamp): # обновл
 
 def GetLastState2(conn: sqlite3.Connection, user_id):
     cur = conn.execute('SELECT max(id) as id, begin_online, end_online FROM statistics WHERE user_id = {}'.format(user_id))
-    data cur.fetchone()
+    data = cur.fetchone()
 
     if data == None:
         return None
 
     if data[1] != None and data[2] != None:
         return 0
-    else if data[1] != None:
+    elif data[1] != None:
         return 1
 
 
