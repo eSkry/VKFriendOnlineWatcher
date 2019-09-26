@@ -34,7 +34,7 @@ def get_friends(vk, conn):
 
         if int(user['online']) == 0:
             db.InsertOffline2(conn, user['id'], timestamp)
-        elif int(user['online'] == 1):
+        elif int(user['online']) == 1:
             db.InsertOnline2(conn, user['id'], timestamp)
 
     pgt.SendMetrics(pushgateway_str)

@@ -46,13 +46,15 @@ def InsertMetrics(conn: sqlite3.Connection, metrics):
         
     conn.commit()
 
-def InsertOnline2(conn: sqlite3.Connection, user_id, timestamp): # Создает новую запись
+def InsertOnline2(conn: sqlite3.Connection, user_id, timestamp, autocommit = True): # Создает новую запись
     conn.execute('INSERT INTO statistics (user_id, begin_online) VALUES ({}, {})'.format(user_id, timestamp))
-    conn.commit()
+    if autocommit:
+        conn.commit()
 
-def InsertOffline2(conn: sqlite3.Connection, user_id, timestamp): # обновляет запись добавляя в нее дату завершения сессии
+def InsertOffline2(conn: sqlite3.Connection, user_id, timestamp, autocommit = True): # обновляет запись добавляя в нее дату завершения сессии
     conn.execute('UPDATE statistics SET end_online = {} WHERE id = (SELECT max(id) FROM statistics WHERE user_id = {})'.format(timestamp, user_id))
-    conn.commit()
+    if autocommit:
+        conn.commit()
 
 def GetLastState2(conn: sqlite3.Connection, user_id):
     cur = conn.execute('SELECT max(id) as id, begin_online, end_online FROM statistics WHERE user_id = {}'.format(user_id))
