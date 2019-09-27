@@ -33,10 +33,11 @@ def get_friends(vk, conn):
                 continue
 
         if int(user['online']) == 0:
-            db.InsertOffline2(conn, user['id'], timestamp)
+            db.InsertOffline2(conn, user['id'], timestamp, False)
         elif int(user['online']) == 1:
-            db.InsertOnline2(conn, user['id'], timestamp)
+            db.InsertOnline2(conn, user['id'], timestamp, False)
 
+    conn.commit()
     pgt.SendMetrics(pushgateway_str)
 
 while (True):
