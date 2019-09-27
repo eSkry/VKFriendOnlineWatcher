@@ -34,18 +34,6 @@ def CreateDB(sql_file: str, db_name = DB_NAME):
 
     return conn
 
-
-def GetLastState(conn: sqlite3.Connection, user_id):
-    return conn.execute('SELECT *, max(timestamp) FROM statistics WHERE user_id = {}'.format(user_id))
-
-
-def InsertMetrics(conn: sqlite3.Connection, metrics):
-    for key in metrics.keys():
-        conn.execute('INSERT INTO statistics (user_id, online, timestamp) VALUES ({}, {}, {});'
-                    .format( metrics[key]['id'], metrics[key]['online'], metrics[key]['timestamp'] ))
-        
-    conn.commit()
-
 def InsertOnline2(conn: sqlite3.Connection, user_id, timestamp, autocommit = True): # Создает новую запись
     conn.execute('INSERT INTO statistics (user_id, begin_online) VALUES ({}, {})'.format(user_id, timestamp))
     if autocommit:
