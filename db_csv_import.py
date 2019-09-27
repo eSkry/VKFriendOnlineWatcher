@@ -5,22 +5,29 @@ import os
 import db_tools as db
 
 
-def importToCSV(conn: sqlite3.Connection, data):
-    with open('resultcsv.csv', 'w') as f:
-        f.write('id,online,timestamp')
-        for id in data.keys():
-            f.write( '{};{};{}'.format( id, data[id]['online'], data[id]['timestamp'] ) )
+# def importToCSV(conn: sqlite3.Connection, data):
+#     with open('resultcsv.csv', 'w') as f:
+#         f.write('id,begin_online,end_online')
+#         for id in data.keys():
+#             f.write( '{};{};{}'.format( id, data[id]['online'], data[id]['timestamp'] ) )
 
 
 def importToCSV():
     conn = db.CreateDB('init.sql')
 
     with open('resultcsv.csv', 'w') as f:
-        f.write('id;online;date;time\n')
+        f.write('id;begin_online;end_online\n')
         table = db.getAllData(conn).fetchall()
         for row in table:
-            date = datetime.fromtimestamp(row[3])
-            f.write('{};{};{};{}\n'.format( row[1], row[2], date.strftime('%d.%m.%Y'), date.strftime('%H:%M:%S') ))
+            begin_session = datetime.fromtimestamp(row[2]).strftime('%d.%m.%Y %H:%M')
+            end_session = ""
+
+            if row[3] != None:
+                end_session = datetime.fromtimestamp(row[3]).strftime('%d.%m.%Y %H:%M')
+            else:
+                end_session = None
+
+            f.write('{};{};{}\n'.format( row[1], begin_session, end_session ))
 
 
 if __name__ == '__main__':
