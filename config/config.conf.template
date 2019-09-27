@@ -1,3 +1,6 @@
 [Auth]
 vk_login=login
 vk_password=pass
+
+[Prometheus]
+host=addr

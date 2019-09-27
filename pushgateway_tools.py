@@ -1,8 +1,11 @@
+import configparser
 import requests
 import os
 
-SERVER_ADDRES = 'http://85.10.234.188:9091/metrics/job/VKFriendOnlineWatcher'
+config = configparser.ConfigParser()
+config.read("./config/config.conf")
 
+SERVER_ADDRES = config['Prometheus']['host']
 
 headers={'Content-type': 'text/plain; charset=utf-8'}
 
