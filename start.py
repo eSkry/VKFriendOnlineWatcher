@@ -13,6 +13,8 @@ UPDATE_TIME = 60 # In seconds
 config = configparser.ConfigParser()
 config.read("./config/config.conf")
 
+PUSHGATWAY_SEND = config['Prometheus']['active'].lower() == "true"
+
 def GetUnixTimestamp():
     return datetime.now().timestamp()
 
@@ -28,7 +30,8 @@ def get_friends(vk, conn):
 
         if state != None:
             full_name = str(user['first_name']) + ' ' + str(user['last_name'])
-            pushgateway_str += 'friends_online_stats{user="' +  str(user['id']) + '", full_name="' + full_name + '"} ' + str(user['online']) + '\n'
+            if PUSHGATWAY_SEND:
+                pushgateway_str += 'friends_online_stats{user="' +  str(user['id']) + '", full_name="' + full_name + '"} ' + str(user['online']) + '\n'
             if int(state) == int(user['online']):
                 continue
 
@@ -38,13 +41,15 @@ def get_friends(vk, conn):
             db.InsertOnline2(conn, user['id'], timestamp, False)
 
     conn.commit()
-    try:
-        pgt.SendMetrics(pushgateway_str)
-    except Exception as e:
-        print('Pushgateway send error')
-        print(e)
-    finally:
-        pass
+    
+    if PUSHGATWAY_SEND:
+        try:
+            pgt.SendMetrics(pushgateway_str)
+        except Exception as e:
+            print('Pushgateway send error')
+            print(e)
+        finally:
+            pass
 
 while (True):
     try:
