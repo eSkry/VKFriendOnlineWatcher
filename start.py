@@ -38,7 +38,13 @@ def get_friends(vk, conn):
             db.InsertOnline2(conn, user['id'], timestamp, False)
 
     conn.commit()
-    pgt.SendMetrics(pushgateway_str)
+    try:
+        pgt.SendMetrics(pushgateway_str)
+    except Exception as e:
+        print('Pushgateway send error')
+        print(e)
+    finally:
+        pass
 
 while (True):
     try:
