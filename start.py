@@ -24,9 +24,8 @@ def GetUnixTimestamp():
 
 
 def get_friends(vk, conn):
-    friends = vk.friends.get(fields=['sex'])['items']
-    dop_users = vk.users.get(user_ids=DOP_USER_IDS, fields=['online'])
-
+    friends = vk.friends.get(fields=['online', 'last_seen'])['items']
+    dop_users = vk.users.get(user_ids=DOP_USER_IDS, fields=['online', 'last_seen'])
     user_status_list = friends + dop_users
 
     timestamp = GetUnixTimestamp()
@@ -36,6 +35,10 @@ def get_friends(vk, conn):
     for user in user_status_list:
         user_id = int(user['id'])
         user_online = int(user['online'])
+        user_last_seen = -1
+        if 'last_seen' in user:
+            user_last_seen = int(user['last_seen']['platform'])
+
         full_name = str(user['first_name']) + ' ' + str(user['last_name'])
         state = db.GetLastState2(conn, user_id)
 
@@ -51,7 +54,7 @@ def get_friends(vk, conn):
                 continue
 
         if user_online == 0:
-            db.InsertOffline2(conn, user_id, timestamp, False)
+            db.InsertOffline2(conn, user_id, timestamp, user_last_seen, False)
         elif user_online == 1:
             db.InsertOnline2(conn, user_id, timestamp, False)
 

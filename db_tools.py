@@ -39,8 +39,8 @@ def InsertOnline2(conn: sqlite3.Connection, user_id, timestamp, autocommit = Tru
     if autocommit:
         conn.commit()
 
-def InsertOffline2(conn: sqlite3.Connection, user_id, timestamp, autocommit = True): # обновляет запись добавляя в нее дату завершения сессии
-    conn.execute('UPDATE statistics SET end_online = {} WHERE id = (SELECT max(id) FROM statistics WHERE user_id = {})'.format(timestamp, user_id))
+def InsertOffline2(conn: sqlite3.Connection, user_id, timestamp, platform, autocommit = True): # обновляет запись добавляя в нее дату завершения сессии
+    conn.execute('UPDATE statistics SET end_online = {}, platform={} WHERE id = (SELECT max(id) FROM statistics WHERE user_id = {})'.format(timestamp, platform, user_id))
     if autocommit:
         conn.commit()
 
