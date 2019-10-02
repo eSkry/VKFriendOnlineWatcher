@@ -7,6 +7,7 @@ import os
 
 import db_tools as db
 import pushgateway_tools as pgt
+import fs_tools
 
 UPDATE_TIME = 60 # In seconds
 
@@ -16,6 +17,7 @@ config.read("./config/config.conf")
 PUSHGATWAY_SEND = config['Prometheus']['active'].lower() == "true"
 
 VK_USER_IDS = []
+DOP_USER_IDS = []
 
 def GetUnixTimestamp():
     return datetime.now().timestamp()
@@ -23,12 +25,17 @@ def GetUnixTimestamp():
 
 def get_friends(vk, conn):
     friends = vk.friends.get(fields=['sex'])['items']
+    dop_users = vk.users.get(user_ids=DOP_USER_IDS, fields=['online'])
+
+    user_status_list = friends + dop_users
+
     timestamp = GetUnixTimestamp()
 
     pushgateway_str = ""
 
-    for user in friends:
+    for user in user_status_list:
         user_id = int(user['id'])
+        user_online = int(user['online'])
         full_name = str(user['first_name']) + ' ' + str(user['last_name'])
         state = db.GetLastState2(conn, user_id)
 
@@ -39,13 +46,13 @@ def get_friends(vk, conn):
 
         if state != None:
             if PUSHGATWAY_SEND:
-                pushgateway_str += 'friends_online_stats{user="' +  str(user_id) + '", full_name="' + full_name + '"} ' + str(user['online']) + '\n'
-            if int(state) == int(user['online']):
+                pushgateway_str += 'friends_online_stats{user="' +  str(user_id) + '", full_name="' + full_name + '"} ' + str(user_online) + '\n'
+            if int(state) == user_online:
                 continue
 
-        if int(user['online']) == 0:
+        if user_online == 0:
             db.InsertOffline2(conn, user_id, timestamp, False)
-        elif int(user['online']) == 1:
+        elif user_online == 1:
             db.InsertOnline2(conn, user_id, timestamp, False)
 
     conn.commit()
@@ -66,6 +73,8 @@ while (True):
         vk_session.auth()
         vk = vk_session.get_api()
         conn = db.CreateDB('init.sql')
+
+        DOP_USER_IDS = fs_tools.GetIdList(config['Users']['file'])
 
         while (True):
             get_friends(vk, conn)

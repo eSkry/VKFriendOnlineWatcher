@@ -5,3 +5,6 @@ vk_password=pass
 [Prometheus]
 active=False # Отправлять ли данные на pushgateway
 host=addr
+
+[Users]
+file=add_users.txt # В файле перечислены дополнительные ID пользователей для которых необходимо проверять статус в сети (id разделяются новой строкой)
