@@ -22,7 +22,7 @@ def GetUnixTimestamp():
 
 
 def get_friends(vk, conn):
-    friends = vk.friends.get(fields=['sex, nickname'])['items']
+    friends = vk.friends.get(fields=['sex'])['items']
     timestamp = GetUnixTimestamp()
 
     pushgateway_str = ""
