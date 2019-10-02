@@ -15,6 +15,8 @@ config.read("./config/config.conf")
 
 PUSHGATWAY_SEND = config['Prometheus']['active'].lower() == "true"
 
+VK_USER_IDS = []
+
 def GetUnixTimestamp():
     return datetime.now().timestamp()
 
@@ -26,19 +28,25 @@ def get_friends(vk, conn):
     pushgateway_str = ""
 
     for user in friends:
-        state = db.GetLastState2(conn, int(user['id']))
+        user_id = int(user['id'])
+        full_name = str(user['first_name']) + ' ' + str(user['last_name'])
+        state = db.GetLastState2(conn, user_id)
+
+        if not user_id in VK_USER_IDS:
+            VK_USER_IDS.append(user_id)
+            if not db.IsUserExists(conn, user_id):
+                db.AddNewUser(conn, user_id, full_name, False)
 
         if state != None:
-            full_name = str(user['first_name']) + ' ' + str(user['last_name'])
             if PUSHGATWAY_SEND:
-                pushgateway_str += 'friends_online_stats{user="' +  str(user['id']) + '", full_name="' + full_name + '"} ' + str(user['online']) + '\n'
+                pushgateway_str += 'friends_online_stats{user="' +  str(user_id) + '", full_name="' + full_name + '"} ' + str(user['online']) + '\n'
             if int(state) == int(user['online']):
                 continue
 
         if int(user['online']) == 0:
-            db.InsertOffline2(conn, user['id'], timestamp, False)
+            db.InsertOffline2(conn, user_id, timestamp, False)
         elif int(user['online']) == 1:
-            db.InsertOnline2(conn, user['id'], timestamp, False)
+            db.InsertOnline2(conn, user_id, timestamp, False)
 
     conn.commit()
     

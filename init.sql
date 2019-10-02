@@ -5,4 +5,9 @@ CREATE TABLE IF NOT EXISTS `statistics` (
 	"begin_online"	REAL DEFAULT NULL,
 	"end_online"	REAL DEFAULT NULL
 );
+CREATE TABLE IF NOT EXISTS `vk_users` (
+	"id"		INTEGER PRIMARY KEY AUTOINCREMENT,
+	"user_id" 	INTEGER NOT NULL,
+	"full_name" TEXT
+);
 COMMIT;

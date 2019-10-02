@@ -56,6 +56,20 @@ def GetLastState2(conn: sqlite3.Connection, user_id):
     elif data[1] != None:
         return 1
 
+def IsUserExists(conn: sqlite3.Connection, user_id):
+    cur = conn.execute('SELECT * FROM vk_users WHERE user_id = {}'.format(user_id))
+    data = cur.fetchone()
+
+    if data != None:
+        return True
+    
+    return False
+
+def AddNewUser(conn: sqlite3.Connection, user_id, full_name, autocommit = True):
+    conn.execute('INSERT INTO vk_users (user_id, full_name) VALUES ({}, "{}")'.format(user_id, full_name))
+    
+    if autocommit:
+        conn.commit()
 
 def getAllData(conn: sqlite3.Connection):
     return conn.execute('SELECT * FROM statistics;')
