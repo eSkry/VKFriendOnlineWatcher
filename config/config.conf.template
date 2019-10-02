@@ -3,5 +3,5 @@ vk_login=login
 vk_password=pass
 
 [Prometheus]
-host=addr
 active=False # Отправлять ли данные на pushgateway
+host=addr
