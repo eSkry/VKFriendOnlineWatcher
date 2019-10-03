@@ -1,3 +1,4 @@
+from sys import platform
 import os
 
 # Return true if file exists
@@ -20,3 +21,20 @@ def ReadAllFile(file: str):
 
 def GetIdList(file: str):
     return ReadAllFile(file).split('\n')
+
+def GetConfigPath():
+    path1 = './config/config.conf'
+    if IsFileExists(path1):
+        return path1
+
+    if platform == "linux" or platform == "linux2":
+        path2 = '~/.depish/VKFriendOnlineWatcher/config.conf'
+        path3 = '/etc/depish/VKFriendOnlineWatcher/config.conf'
+        if IsFileExists(path2):
+            return path2
+        if IsFileExists(path3):
+            return path3
+
+    return None
+
+    

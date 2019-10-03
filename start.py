@@ -11,8 +11,9 @@ import fs_tools
 
 UPDATE_TIME = 60 # In seconds
 
+CONFIG_PATH = fs_tools.GetConfigPath()
 config = configparser.ConfigParser()
-config.read("./config/config.conf")
+config.read(CONFIG_PATH)
 
 PUSHGATWAY_SEND = config['Prometheus']['active'].lower() == "true"
 
@@ -70,14 +71,22 @@ def get_friends(vk, conn):
             pass
 
 while (True):
+    if CONFIG_PATH == None:
+        print('Config is not exists! Please create config cin ./config/config.conf')
+        print('Stop service')
+        break
+    
+    print('Using config file: {}'.format(CONFIG_PATH))
+
     try:
-        print('Working')
+        print('Service working')
         vk_session = vk_api.VkApi(config['Auth']['vk_login'], config['Auth']['vk_password'])
         vk_session.auth()
         vk = vk_session.get_api()
         conn = db.CreateDB('init.sql')
 
-        DOP_USER_IDS = fs_tools.GetIdList(config['Users']['file'])
+        if config.has_section('Users'):
+            DOP_USER_IDS = fs_tools.GetIdList(config['Users']['file'])
 
         while (True):
             get_friends(vk, conn)
