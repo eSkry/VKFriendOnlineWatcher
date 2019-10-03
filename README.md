@@ -15,3 +15,7 @@
 ## TODO
 
 - Добавить возможность отправки метрик на PostgreSQL сервер БД
+
+## Grafana dashboard
+
+![Grafana_dashboard](https://github.com/eSkry/VKFriendOnlineWatcher/img/dashboard.png)
