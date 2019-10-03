@@ -5,9 +5,10 @@ import vk_api
 import time
 import os
 
-import db_tools as db
-import pushgateway_tools as pgt
-import fs_tools
+from modules import db_tools as db
+from modules import pushgateway_tools as pgt
+from modules import fs_tools
+
 
 UPDATE_TIME = 60 # In seconds
 
