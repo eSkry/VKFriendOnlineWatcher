@@ -49,7 +49,7 @@ def get_friends(vk, conn):
 
         if state != None:
             if PUSHGATWAY_SEND:
-                pushgateway_str += 'friends_online_stats{user="' +  str(user_id) + '", full_name="' + full_name + '"} ' + str(user_online) + '\n'
+                pushgateway_str += 'friends_online_stats{user="' +  str(user_id) + '", full_name="' + full_name + '", platform="' + str(user_last_seen) + '"} ' + str(user_online) + '\n'
             if int(state) == user_online:
                 continue
 
