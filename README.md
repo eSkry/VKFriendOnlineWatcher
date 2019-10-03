@@ -18,4 +18,4 @@
 
 ## Grafana dashboard
 
-![Grafana_dashboard](https://github.com/eSkry/VKFriendOnlineWatcher/img/dashboard.png)
+![Grafana_dashboard](https://github.com/eSkry/VKFriendOnlineWatcher/blob/master/img/dashboard.png)
