@@ -9,7 +9,6 @@ from modules import db_tools as db
 from modules import pushgateway_tools as pgt
 from modules import fs_tools
 
-
 UPDATE_TIME = 60 # In seconds
 
 CONFIG_PATH = fs_tools.GetConfigPath()
@@ -84,7 +83,7 @@ while (True):
         vk_session = vk_api.VkApi(config['Auth']['vk_login'], config['Auth']['vk_password'])
         vk_session.auth()
         vk = vk_session.get_api()
-        conn = db.CreateDB('init.sql')
+        conn = db.CreateDB('./sql/init.sql')
 
         if config.has_section('Users'):
             DOP_USER_IDS = fs_tools.GetIdList(config['Users']['file'])
