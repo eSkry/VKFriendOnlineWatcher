@@ -24,7 +24,7 @@ def GetUnixTimestamp():
     return datetime.now().timestamp()
 
 
-def get_friends(vk, conn):
+def update_metrics(vk, conn):
     friends = vk.friends.get(fields=['online', 'last_seen'])['items']
     dop_users = vk.users.get(user_ids=DOP_USER_IDS, fields=['online', 'last_seen'])
     user_status_list = friends + dop_users
@@ -89,7 +89,7 @@ while (True):
             DOP_USER_IDS = fs_tools.GetIdList(config['Users']['file'])
 
         while (True):
-            get_friends(vk, conn)
+            update_metrics(vk, conn)
             time.sleep( UPDATE_TIME )
 
     except vk_api.AuthError:
