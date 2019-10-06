@@ -2,7 +2,9 @@ from datetime import datetime
 import configparser
 import sqlite3
 import vk_api
+import signal
 import time
+import sys
 import os
 
 from modules import db_tools as db
@@ -70,7 +72,19 @@ def update_metrics(vk, conn):
         finally:
             pass
 
-while (True):
+
+KILL_APP = False
+
+def __handle_exit(sig, frame):
+    KILL_APP = True
+    print('\nEXITING')
+    time.sleep( 2 )
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, __handle_exit)
+signal.signal(signal.SIGTERM, __handle_exit)
+
+while not KILL_APP:
     if CONFIG_PATH == None:
         print('Config is not exists! Please create config cin ./config/config.conf')
         print('Stop service')
@@ -88,7 +102,7 @@ while (True):
         if config.has_section('Users'):
             DOP_USER_IDS = fs_tools.GetIdList(config['Users']['file'])
 
-        while (True):
+        while not KILL_APP:
             update_metrics(vk, conn)
             time.sleep( UPDATE_TIME )
 
