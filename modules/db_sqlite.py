@@ -12,12 +12,11 @@ def ReadAllFile(file: str):
         f.close()
         return data
     else:
-        return ''
+        return None
 
 # Return true if file exists
 def IsFileExists(file):
     return os.path.exists(file) and os.path.isfile(file)
-
 
 def CreateDB(sql_file: str, db_name = DB_NAME):
     if (IsFileExists(db_name)):

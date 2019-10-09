@@ -17,7 +17,7 @@ def ReadAllFile(file: str):
         f.close()
         return data
     else:
-        return ''
+        return None
 
 def GetIdList(file: str):
     return ReadAllFile(file).split('\n')
