@@ -7,7 +7,7 @@ import time
 import sys
 import os
 
-from modules import db_tools as db
+from modules import db_sqlite as db
 from modules import pushgateway_tools as pgt
 from modules import fs_tools
 

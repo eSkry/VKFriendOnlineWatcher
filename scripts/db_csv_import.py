@@ -2,8 +2,7 @@ from datetime import datetime
 import sqlite3
 import os
 
-import db_tools as db
-
+from modules import db_sqlite as db
 
 # def importToCSV(conn: sqlite3.Connection, data):
 #     with open('resultcsv.csv', 'w') as f:
