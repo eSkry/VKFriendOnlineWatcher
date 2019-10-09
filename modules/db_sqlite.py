@@ -55,6 +55,9 @@ def GetLastState2(conn: sqlite3.Connection, user_id):
     elif data[1] != None:
         return 1
 
+def GetLastStateFull(conn: sqlite3.Connection, user_id):
+    return conn.execute('SELECT max(id) as id, begin_online, end_online, platform FROM statistics WHERE user_id = {}'.format(user_id)).fetchone()
+
 def IsUserExists(conn: sqlite3.Connection, user_id):
     cur = conn.execute('SELECT * FROM vk_users WHERE user_id = {}'.format(user_id))
     data = cur.fetchone()
