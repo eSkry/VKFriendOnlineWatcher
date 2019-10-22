@@ -92,12 +92,12 @@ while not KILL_APP:
     
     print('Using config file: {}'.format(CONFIG_PATH))
 
+    conn = db.CreateDB('./sql/init.sql')
     try:
         print('Service working')
         vk_session = vk_api.VkApi(config['Auth']['vk_login'], config['Auth']['vk_password'])
         vk_session.auth()
         vk = vk_session.get_api()
-        conn = db.CreateDB('./sql/init.sql')
 
         if config.has_section('Users'):
             DOP_USER_IDS = fs_tools.GetIdList(config['Users']['file'])
@@ -115,4 +115,6 @@ while not KILL_APP:
         print(e)
         print('Stop working')
     finally:
-        time.sleep( 1 )
+        time.sleep(1)
+        conn.close()
+        KILL_APP = True
