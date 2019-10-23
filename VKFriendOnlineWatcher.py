@@ -78,43 +78,35 @@ KILL_APP = False
 def __handle_exit(sig, frame):
     KILL_APP = True
     print('\nEXITING')
-    time.sleep( 2 )
+    time.sleep(2)
     sys.exit(0)
 
 signal.signal(signal.SIGINT, __handle_exit)
 signal.signal(signal.SIGTERM, __handle_exit)
 
-while not KILL_APP:
-    if CONFIG_PATH == None:
-        print('Config is not exists! Please create config cin ./config/config.conf')
-        print('Stop service')
-        break
-    
-    print('Using config file: {}'.format(CONFIG_PATH))
+if CONFIG_PATH == None:
+    print('Config is not exists! Please create config cin ./config/config.conf')
+    sys.exit(0)
 
-    conn = db.CreateDB('./sql/init.sql')
-    try:
-        print('Service working')
-        vk_session = vk_api.VkApi(config['Auth']['vk_login'], config['Auth']['vk_password'])
-        vk_session.auth()
-        vk = vk_session.get_api()
+print('Using config file: {}'.format(CONFIG_PATH))
+conn = db.CreateDB('./sql/init.sql')
 
-        if config.has_section('Users'):
-            DOP_USER_IDS = fs_tools.GetIdList(config['Users']['file'])
+try:
+    vk_session = vk_api.VkApi(config['Auth']['vk_login'], config['Auth']['vk_password'])
+    vk_session.auth()
+    vk = vk_session.get_api()
 
-        while not KILL_APP:
-            update_metrics(vk, conn)
-            time.sleep( UPDATE_TIME )
+    if config.has_section('Users'):
+        DOP_USER_IDS = fs_tools.GetIdList(config['Users']['file'])
 
-    except vk_api.AuthError:
-        print('VK Auth error')
-    except vk_api.VkApiError:
-        print('VK API error')
-    except Exception as e:
-        print('Error in main stream, continue work....')
-        print(e)
-        print('Stop working')
-    finally:
-        time.sleep(1)
-        conn.close()
-        KILL_APP = True
+    while not KILL_APP:
+        update_metrics(vk, conn)
+        time.sleep(UPDATE_TIME)
+
+except Exception as e:
+    print(e)
+finally:
+    conn.close()
+    KILL_APP = True
+
+print('Stop working')

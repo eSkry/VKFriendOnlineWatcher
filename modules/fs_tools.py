@@ -28,7 +28,7 @@ def GetConfigPath():
         return path1
 
     if platform == "linux" or platform == "linux2":
-        path2 = '~/.depish/VKFriendOnlineWatcher/config.conf'
+        path2 = '~/.local/VKFriendOnlineWatcher/config.conf'
         path3 = '/etc/depish/VKFriendOnlineWatcher/config.conf'
         if IsFileExists(path2):
             return path2
