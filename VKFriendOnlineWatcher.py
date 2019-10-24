@@ -24,6 +24,7 @@ class Main(object):
         self.longpool = VkLongPoll(self.vk_session)
         self.VK_USER_IDS = []
         self.DOP_USER_IDS = []
+        self.DB = db.CreateDB('./sql/init.sql')
 
         if self.CONFIG.PROMETHEUS_SEND:
             self.pgt_sender = pgt.PushgatewaySender(self.CONFIG.PROMETHEUS_HOST)
@@ -39,16 +40,18 @@ class Main(object):
     def Loop(self):
         for event in self.longpool.listen():
             if event.type == VkEventType.USER_ONLINE:
-                pass
-            if event.type == VkEventType.USER_OFFLINE:
-                pass
-            
+                db.InsertOnline(self.DB, event.user_id, event.timestamp)
+            elif event.type == VkEventType.USER_OFFLINE:
+                db.InsertOnline(self.DB, event.user_id, event.timestamp)
+
+    def _updateDopUsers(self):
+        pass            
 
     def GetUnixTimestamp(self):
         return datetime.now().timestamp()
 
     def _handleExit(self, sig, frame):
-
+        sys.exit(0)
 
 def update_metrics(vk, conn):
     friends = vk.friends.get(fields=['online', 'last_seen'])['items']

@@ -33,17 +33,17 @@ def CreateDB(sql_file: str, db_name = DB_NAME):
 
     return conn
 
-def InsertOnline2(conn: sqlite3.Connection, user_id, timestamp, autocommit = True): # Создает новую запись
+def InsertOnline(conn: sqlite3.Connection, user_id, timestamp, autocommit = True): # Создает новую запись
     conn.execute('INSERT INTO statistics (user_id, begin_online) VALUES ({}, {})'.format(user_id, timestamp))
     if autocommit:
         conn.commit()
 
-def InsertOffline2(conn: sqlite3.Connection, user_id, timestamp, platform, autocommit = True): # обновляет запись добавляя в нее дату завершения сессии
+def InsertOffline(conn: sqlite3.Connection, user_id, timestamp, platform, autocommit = True): # обновляет запись добавляя в нее дату завершения сессии
     conn.execute('UPDATE statistics SET end_online = {}, platform={} WHERE id = (SELECT max(id) FROM statistics WHERE user_id = {})'.format(timestamp, platform, user_id))
     if autocommit:
         conn.commit()
 
-def GetLastState2(conn: sqlite3.Connection, user_id):
+def GetLastState(conn: sqlite3.Connection, user_id):
     cur = conn.execute('SELECT max(id) as id, begin_online, end_online FROM statistics WHERE user_id = {}'.format(user_id))
     data = cur.fetchone()
 

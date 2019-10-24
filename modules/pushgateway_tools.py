@@ -25,5 +25,8 @@ class PushgatewaySender(object):
         data_line += "}} {} {}\n".format(value, timestamp)
         return data_line
 
+    def SendMetrick(self, metrick: str):
+        self._sendData(metrick)
+
     def _sendData(self, content: str):
         requests.post(self.SERVER_ADDRES, data=content.encode('utf-8'), headers=self.HEADERS)
