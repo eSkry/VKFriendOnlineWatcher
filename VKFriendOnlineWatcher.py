@@ -33,7 +33,7 @@ def update_metrics(vk, conn):
 
     timestamp = GetUnixTimestamp()
 
-    pushgateway_str = ""
+    pgt_sender = pgt.PushgatewaySender(config['Prometheus']['host'])
 
     for user in user_status_list:
         user_id = int(user['id'])
@@ -52,7 +52,8 @@ def update_metrics(vk, conn):
 
         if state != None:
             if PUSHGATWAY_SEND:
-                pushgateway_str += 'friends_online_stats{user="' +  str(user_id) + '", full_name="' + full_name + '", platform="' + str(user_last_seen) + '"} ' + str(user_online) + '\n'
+                tags = { 'user': user_id, 'full_name': full_name, 'platform': user_last_seen }
+                pgt_sender.AddToPool( pgt_sender.GetMetricsStr('friends_online_stats', tags, str(user_online)) )
             if int(state) == user_online:
                 continue
 
@@ -65,7 +66,7 @@ def update_metrics(vk, conn):
     
     if PUSHGATWAY_SEND:
         try:
-            pgt.SendMetrics(pushgateway_str)
+            pgt_sender.SendFromPool()
         except Exception as e:
             print('Pushgateway send error')
             print(e)

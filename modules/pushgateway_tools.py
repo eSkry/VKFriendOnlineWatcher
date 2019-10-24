@@ -1,13 +1,29 @@
-import configparser
 import requests
 import os
 
-config = configparser.ConfigParser()
-config.read("./config/config.conf")
+class PushgatewaySender(object):
+    def __init__(self, server_addres):
+        self.SERVER_ADDRES = server_addres
+        self.HEADERS = {'Content-type': 'text/plain; charset=utf-8'}
+        self.METRICKS_POOL = []
 
-SERVER_ADDRES = config['Prometheus']['host']
+    def AddToPool(self, metricks_string: str):
+        self.METRICKS_POOL.append(str)
 
-headers={'Content-type': 'text/plain; charset=utf-8'}
+    def SendFromPool(self):
+        self._sendData(''.join(self.METRICKS_POOL))
+        self.METRICKS_POOL.clear()
 
-def SendMetrics(content: str):
-    requests.post(SERVER_ADDRES, data=content.encode('utf-8'), headers=headers)
+    def GetMetricsStr(self, name, tags: dict, value, timestamp = ''):
+        data_line = "{} {{".format(name)
+
+        kv = []
+        for key, value in tags.items():
+            kv.append('{}="{}"'.format(key, value))
+
+        data_line += ', '.join(kv)
+        data_line += "}} {} {}\n".format(value, timestamp)
+        return data_line
+
+    def _sendData(self, content: str):
+        requests.post(self.SERVER_ADDRES, data=content.encode('utf-8'), headers=self.HEADERS)
