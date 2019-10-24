@@ -1,6 +1,5 @@
 from datetime import datetime
-import configparser
-import sqlite3
+from vk_api.longpoll import VkLongPoll, VkEventType
 import vk_api
 import signal
 import time
@@ -10,20 +9,45 @@ import os
 from modules import db_sqlite as db
 from modules import pushgateway_tools as pgt
 from modules import fs_tools
+import confloader
 
 UPDATE_TIME = 60 # In seconds
 
-CONFIG_PATH = fs_tools.GetConfigPath()
-config = configparser.ConfigParser()
-config.read(CONFIG_PATH)
-
-PUSHGATWAY_SEND = config['Prometheus']['active'].lower() == "true"
-
 VK_USER_IDS = []
-DOP_USER_IDS = []
 
-def GetUnixTimestamp():
-    return datetime.now().timestamp()
+class Main(object):
+    def __init__(self):
+        self.CONFIG = confloader.VKFOConfig()
+        self.vk_session = vk_api.VkApi(login=self.CONFIG.VK_LOGIN, password=self.CONFIG.VK_PASSWORD)
+        self.vk_session.auth()
+        self.vkapi = self.vk_session.get_api()
+        self.longpool = VkLongPoll(self.vk_session)
+        self.VK_USER_IDS = []
+        self.DOP_USER_IDS = []
+
+        if self.CONFIG.PROMETHEUS_SEND:
+            self.pgt_sender = pgt.PushgatewaySender(self.CONFIG.PROMETHEUS_HOST)
+
+        if self.CONFIG.HAS_UPSER_FILE:
+            self.DOP_USER_IDS = fs_tools.GetIdList(self.CONFIG.USERS_FILE)
+
+        signal.signal(signal.SIGINT, self._handleExit)
+        signal.signal(signal.SIGTERM, self._handleExit)
+
+        self.Loop()
+
+    def Loop(self):
+        for event in self.longpool.listen():
+            if event.type == VkEventType.USER_ONLINE:
+                pass
+            if event.type == VkEventType.USER_OFFLINE:
+                pass
+            
+
+    def GetUnixTimestamp(self):
+        return datetime.now().timestamp()
+
+    def _handleExit(self, sig, frame):
 
 
 def update_metrics(vk, conn):
@@ -42,7 +66,7 @@ def update_metrics(vk, conn):
         if 'last_seen' in user:
             user_last_seen = int(user['last_seen']['platform'])
 
-        full_name = str(user['first_name']) + ' ' + str(user['last_name'])
+        full_name = '{} {}'.format(user['first_name'], user['last_name'])
         state = db.GetLastState2(conn, user_id)
 
         if not user_id in VK_USER_IDS:
@@ -76,15 +100,6 @@ def update_metrics(vk, conn):
 
 KILL_APP = False
 
-def __handle_exit(sig, frame):
-    KILL_APP = True
-    print('\nEXITING')
-    time.sleep(2)
-    sys.exit(0)
-
-signal.signal(signal.SIGINT, __handle_exit)
-signal.signal(signal.SIGTERM, __handle_exit)
-
 if CONFIG_PATH == None:
     print('Config is not exists! Please create config cin ./config/config.conf')
     sys.exit(0)
@@ -92,22 +107,8 @@ if CONFIG_PATH == None:
 print('Using config file: {}'.format(CONFIG_PATH))
 conn = db.CreateDB('./sql/init.sql')
 
-try:
-    vk_session = vk_api.VkApi(config['Auth']['vk_login'], config['Auth']['vk_password'])
-    vk_session.auth()
-    vk = vk_session.get_api()
-
-    if config.has_section('Users'):
-        DOP_USER_IDS = fs_tools.GetIdList(config['Users']['file'])
-
-    while not KILL_APP:
-        update_metrics(vk, conn)
-        time.sleep(UPDATE_TIME)
-
-except Exception as e:
-    print(e)
-finally:
-    conn.close()
-    KILL_APP = True
+while not KILL_APP:
+    update_metrics(vk, conn)
+    time.sleep(UPDATE_TIME)
 
 print('Stop working')
