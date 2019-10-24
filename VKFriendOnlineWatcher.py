@@ -11,9 +11,6 @@ from modules import pushgateway_tools as pgt
 from modules import fs_tools
 import confloader
 
-UPDATE_TIME = 60 # In seconds
-
-VK_USER_IDS = []
 
 class Main(object):
     def __init__(self):
@@ -39,13 +36,21 @@ class Main(object):
 
     def Loop(self):
         for event in self.longpool.listen():
+            tags = { 'user': event.user_id, 'full_name': event.full_name, 'platform': event.last_seen }
             if event.type == VkEventType.USER_ONLINE:
                 db.InsertOnline(self.DB, event.user_id, event.timestamp)
+                pgt_sender.AddToPool(pgt_sender.GetMetricsStr('friends_online_stats', tags, '1'))
             elif event.type == VkEventType.USER_OFFLINE:
-                db.InsertOnline(self.DB, event.user_id, event.timestamp)
+                db.InsertOffline(self.DB, event.user_id, event.timestamp, event.last_seen)
+            
+            if event.user_id not in self.VK_USER_IDS:
+                self.VK_USER_IDS.append(event.user_id)
+                db.AddNewUser(self.DB, event.user_id, event.full_name)
+
 
     def _updateDopUsers(self):
-        pass            
+        if self.CONFIG.HAS_UPSER_FILE:
+            fs_tools.GetIdList(self.CONFIG.USERS_FILE)
 
     def GetUnixTimestamp(self):
         return datetime.now().timestamp()
@@ -53,14 +58,13 @@ class Main(object):
     def _handleExit(self, sig, frame):
         sys.exit(0)
 
+
+
+
 def update_metrics(vk, conn):
     friends = vk.friends.get(fields=['online', 'last_seen'])['items']
     dop_users = vk.users.get(user_ids=DOP_USER_IDS, fields=['online', 'last_seen'])
     user_status_list = friends + dop_users
-
-    timestamp = GetUnixTimestamp()
-
-    pgt_sender = pgt.PushgatewaySender(config['Prometheus']['host'])
 
     for user in user_status_list:
         user_id = int(user['id'])
@@ -68,9 +72,6 @@ def update_metrics(vk, conn):
         user_last_seen = -1
         if 'last_seen' in user:
             user_last_seen = int(user['last_seen']['platform'])
-
-        full_name = '{} {}'.format(user['first_name'], user['last_name'])
-        state = db.GetLastState2(conn, user_id)
 
         if not user_id in VK_USER_IDS:
             VK_USER_IDS.append(user_id)
