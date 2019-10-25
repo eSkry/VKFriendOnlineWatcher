@@ -1,7 +1,6 @@
 import sqlite3
 import os
 
-
 DB_NAME = 'db.db'
 
 # Reading file to string and return his
