@@ -24,11 +24,6 @@
 Раздел ***Users***
 - **file** - Фаил в котором перечислены ID пользоватлей состояние которых необходимо отслеживать
 
-## TODO
-
-- Добавить возможность отправки метрик на PostgreSQL сервер БД
-- Дружественные связи между людьми (граф друзей и перечисленных людей)
-
 ## Grafana dashboard
 
 ![Grafana_dashboard](https://github.com/eSkry/VKFriendOnlineWatcher/blob/master/img/dashboard.png)
