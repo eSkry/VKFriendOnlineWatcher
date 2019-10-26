@@ -8,7 +8,7 @@ class VKFOConfig(object):
         conf.read('./config/config.conf')
 
         self.VK_LOGIN = conf['Auth']['vk_login']
-        self.VK_PASSWORD = conf['Auth']['ck_password']
+        self.VK_PASSWORD = conf['Auth']['vk_password']
 
         if conf.has_section('Prometheus'):
             self.PROMETHEUS_SEND = conf['Prometheus']['active'].lower() == "true"

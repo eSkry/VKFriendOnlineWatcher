@@ -23,8 +23,9 @@ class Main(object):
         self.VK_USER_IDS = []
         self.DOP_USER_IDS = []
         self.DB = db.CreateDB('./sql/init.sql')
-        self.ceck_timer = threading.Timer(60, self.UpdateDopUsers)
-        self.is_running = True
+        self.ceck_timer = threading.Timer(60, self._updateDopUsers)
+        self.main_timer = threading.Timer(1, self._loop)
+        self.is_running = False
 
         if self.CONFIG.PROMETHEUS_SEND:
             self.pgt_sender = pgt.PushgatewaySender(self.CONFIG.PROMETHEUS_HOST)
@@ -38,7 +39,15 @@ class Main(object):
         self.ceck_timer.start()
         self.Loop()
 
-    def Loop(self):
+    def Start(self):
+        self.is_running = True
+        self.ceck_timer.start()
+        self.main_timer.start()
+
+    def Stop(self):
+        self.is_running = False
+
+    def _loop(self):
         for event in self.longpool.listen():
             if not self.is_running:
                 break
@@ -55,7 +64,7 @@ class Main(object):
                 self.VK_USER_IDS.append(event.user_id)
                 db.AddNewUser(self.DB, event.user_id, event.full_name)
 
-    def UpdateDopUsers(self):
+    def _updateDopUsers(self):
         if not self.is_running:
             return
 
@@ -103,9 +112,10 @@ class Main(object):
         return datetime.now().timestamp()
 
     def _handleExit(self, sig, frame):
-        sys.exit(0)
-
+        self.is_running = False
+        print('Stopping')
 
 
 if __name__ == '__main__':
     app = Main()
+    app.Start()
