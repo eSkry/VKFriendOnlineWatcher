@@ -1,4 +1,5 @@
 from datetime import datetime
+import threading, time
 from vk_api.longpoll import VkLongPoll, VkEventType
 import vk_api
 import signal
@@ -22,6 +23,8 @@ class Main(object):
         self.VK_USER_IDS = []
         self.DOP_USER_IDS = []
         self.DB = db.CreateDB('./sql/init.sql')
+        self.ceck_timer = threading.Timer(60, self.UpdateDopUsers)
+        self.is_running = True
 
         if self.CONFIG.PROMETHEUS_SEND:
             self.pgt_sender = pgt.PushgatewaySender(self.CONFIG.PROMETHEUS_HOST)
@@ -31,11 +34,15 @@ class Main(object):
 
         signal.signal(signal.SIGINT, self._handleExit)
         signal.signal(signal.SIGTERM, self._handleExit)
-
+        
+        self.ceck_timer.start()
         self.Loop()
 
     def Loop(self):
         for event in self.longpool.listen():
+            if not self.is_running:
+                break
+
             tags = { 'user': event.user_id, 'full_name': event.full_name, 'platform': event.last_seen }
             if event.type == VkEventType.USER_ONLINE:
                 db.InsertOnline(self.DB, event.user_id, event.timestamp)
@@ -49,6 +56,9 @@ class Main(object):
                 db.AddNewUser(self.DB, event.user_id, event.full_name)
 
     def UpdateDopUsers(self):
+        if not self.is_running:
+            return
+
         dop_users = self.vkapi.users.get(user_uds=self.DOP_USER_IDS, fields=['online', 'last_seen'])
         timestamp = self.GetUnixTimestamp()
         for user in dop_users:
@@ -81,6 +91,9 @@ class Main(object):
         self.DB.commit()
         if self.CONFIG.PROMETHEUS_SEND:
             self.pgt_sender.SendFromPool()
+
+        if self.is_running:
+            self.ceck_timer.start()
 
     def _updateDopUsers(self):
         if self.CONFIG.HAS_UPSER_FILE:
