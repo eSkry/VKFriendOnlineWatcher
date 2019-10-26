@@ -30,5 +30,5 @@
 - Дружественные связи между людьми (граф друзей и перечисленных людей)
 
 ## Grafana dashboard
-
+Запрос дашбоарда: `friends_online_stats{full_name=~\".*\"}`
 ![Grafana_dashboard](https://github.com/eSkry/VKFriendOnlineWatcher/blob/master/img/dashboard.png)
