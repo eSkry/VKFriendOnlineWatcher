@@ -1,6 +1,7 @@
 [Auth]
 vk_login=login
 vk_password=pass
+vk_app_id=app_id
 vk_token=token
 
 [Prometheus]

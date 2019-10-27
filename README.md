@@ -16,6 +16,7 @@
 Раздел ***Auth***
 - **vk_login** - Номер телефона аккаунта VK
 - **vk_password** - Пароль от аккаунта VK
+- **vk_token*** - Токен
 
 Раздел ***Prometheus***
 - **active** - Использовать ли отправку в prometheus
