@@ -1,6 +1,6 @@
 from datetime import datetime
 import threading, time
-from vk_api.longpoll import VkLongPoll, VkEventType
+from vk_api.longpoll import VkLongPoll, VkEventType, VkLongpollMode
 import vk_api
 import signal
 import time
@@ -16,10 +16,10 @@ import confloader
 class Main(object):
     def __init__(self):
         self.CONFIG = confloader.VKFOConfig()
-        self.vk_session = vk_api.VkApi(login=self.CONFIG.VK_LOGIN, password=self.CONFIG.VK_PASSWORD)
-        self.vk_session.auth()
+        self.vk_session = vk_api.VkApi(login=self.CONFIG.VK_LOGIN, password=self.CONFIG.VK_PASSWORD, token=self.CONFIG.VK_TOKEN)
+        self.vk_session.auth(token_only=True)
+        self.longpoll = VkLongPoll(self.vk_session, mode=VkLongpollMode.GET_EXTRA_ONLINE)
         self.vkapi = self.vk_session.get_api()
-        self.longpool = VkLongPoll(self.vk_session)
         self.VK_USER_IDS = []
         self.DOP_USER_IDS = []
         self.DB = db.CreateDB('./sql/init.sql')
@@ -48,7 +48,7 @@ class Main(object):
         self.is_running = False
 
     def _loop(self):
-        for event in self.longpool.listen():
+        for event in self.longpoll.listen():
             if not self.is_running:
                 break
 

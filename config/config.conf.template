@@ -1,6 +1,7 @@
 [Auth]
 vk_login=login
 vk_password=pass
+vk_token=token
 
 [Prometheus]
 active=False # Отправлять ли данные на pushgateway
