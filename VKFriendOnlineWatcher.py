@@ -16,7 +16,7 @@ import confloader
 class Main(object):
     def __init__(self):
         self.CONFIG = confloader.VKFOConfig()
-        self.vk_session = vk_api.VkApi(login=self.CONFIG.VK_LOGIN, password=self.CONFIG.VK_PASSWORD, app_id=self.CONFIG.VK_APP_ID, token=self.CONFIG.VK_TOKEN)
+        self.vk_session = vk_api.VkApi(login=self.CONFIG.VK_LOGIN, password=self.CONFIG.VK_PASSWORD)
         self.vk_session.auth(token_only=True)
         self.vkapi = self.vk_session.get_api()
         self.VK_USER_IDS = []

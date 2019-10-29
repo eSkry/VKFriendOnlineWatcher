@@ -20,7 +20,8 @@ def ReadAllFile(file: str):
         return None
 
 def GetIdList(file: str):
-    return ReadAllFile(file).split('\n')
+    result = ReadAllFile(file)
+    return '' if result == None else result.split('\n')
 
 def GetConfigPath():
     path1 = './config/config.conf'
