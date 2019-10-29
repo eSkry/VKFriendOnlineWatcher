@@ -39,6 +39,7 @@ class Main(object):
         self.is_running = True
         self.dop_thread.start()
         if self.USE_LONGPOLL:
+            self.longpoll = VkLongPoll(self.vk_session)
             self.loop_thread.start()
 
     def Stop(self):
